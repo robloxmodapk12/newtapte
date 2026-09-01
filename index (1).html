@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tap Tempo — Free BPM Counter to Measure Beats Per Minute</title>
+<meta name="description" content="Free online tap tempo BPM counter. Tap the button or press the spacebar in time with any beat and instantly measure the tempo in beats per minute. Includes a built-in metronome.">
+<meta name="theme-color" content="#0d1017">
+<link rel="canonical" href="https://example.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Tap Tempo — Free BPM Counter">
+<meta property="og:description" content="Tap in time with the beat and instantly measure BPM. Free, no sign-up, works on desktop and mobile.">
+<style>
+:root {
+  --bg: #0d1017;
+  --bg-soft: #141924;
+  --surface: #171d2a;
+  --surface-2: #1e2534;
+  --border: #2a3244;
+  --text: #e8ecf4;
+  --text-dim: #9aa7bd;
+  --accent: #5eead4;
+  --accent-2: #818cf8;
+  --accent-ink: #06231f;
+  --shadow: 0 20px 50px -20px rgba(0, 0, 0, .8);
+  --radius: 16px;
+  --wrap: 940px;
+}
+
+html[data-theme="light"] {
+  --bg: #f6f8fc;
+  --bg-soft: #eef2f9;
+  --surface: #ffffff;
+  --surface-2: #f2f5fb;
+  --border: #dde4f0;
+  --text: #131926;
+  --text-dim: #5a6883;
+  --accent: #0d9488;
+  --accent-2: #4f46e5;
+  --accent-ink: #ffffff;
+  --shadow: 0 18px 40px -24px rgba(20, 32, 60, .35);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 17px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+.wrap { width: min(100% - 2.5rem, var(--wrap)); margin-inline: auto; }
+
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 20;
+  background: var(--accent); color: var(--accent-ink);
+  padding: .6rem 1rem; border-radius: 0 0 10px 0; font-weight: 600;
+}
+.skip-link:focus { left: 0; }
+
+/* ---------- header ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner { display: flex; align-items: center; gap: 1.25rem; height: 62px; }
+.brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--text); font-weight: 700; letter-spacing: -.01em; }
+.brand-mark {
+  width: 22px; height: 22px; border-radius: 7px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.brand-name span { color: var(--accent); }
+.site-nav { margin-left: auto; display: flex; gap: 1.4rem; font-size: .95rem; }
+.site-nav a { color: var(--text-dim); text-decoration: none; }
+.site-nav a:hover { color: var(--text); }
+@media (max-width: 720px) { .site-nav { display: none; } }
+
+.theme-toggle {
+  margin-left: auto; width: 38px; height: 38px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface); cursor: pointer;
+  display: grid; place-items: center;
+}
+.site-nav ~ .theme-toggle { margin-left: 0; }
+.theme-icon {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--text-dim);
+  box-shadow: inset -5px -3px 0 0 var(--surface);
+}
+html[data-theme="light"] .theme-icon { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text-dim); width: 10px; height: 10px; }
+
+/* ---------- hero + tool ---------- */
+.hero { padding: 3rem 0 2rem; background:
+  radial-gradient(900px 380px at 50% -140px, color-mix(in srgb, var(--accent-2) 20%, transparent), transparent 70%); }
+h1 {
+  font-size: clamp(1.75rem, 4.4vw, 2.6rem);
+  line-height: 1.15; letter-spacing: -.025em; margin: 0 0 .8rem;
+  max-width: 22ch;
+}
+.lede { color: var(--text-dim); font-size: 1.06rem; max-width: 64ch; margin: 0 0 2rem; }
+
+.tool {
+  background: linear-gradient(180deg, var(--surface), var(--bg-soft));
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 1.6rem;
+  box-shadow: var(--shadow);
+}
+
+.readout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 1.25rem; align-items: center; }
+@media (max-width: 640px) { .readout { grid-template-columns: 1fr; } }
+
+.bpm-block { text-align: center; }
+.bpm {
+  display: block;
+  font-size: clamp(4rem, 16vw, 6.5rem);
+  font-weight: 800; line-height: .92; letter-spacing: -.05em;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(160deg, var(--text), var(--accent));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bpm-meta { display: flex; align-items: baseline; justify-content: center; gap: .55rem; margin-top: .35rem; }
+.bpm-unit { font-weight: 700; letter-spacing: .22em; font-size: .8rem; color: var(--text-dim); }
+.bpm-precise { font-size: .8rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.tempo-name { margin: .5rem 0 0; color: var(--accent); font-weight: 600; font-size: .95rem; min-height: 1.5em; }
+
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: 0; }
+.stat {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: .65rem .8rem;
+}
+.stat dt { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim); }
+.stat dd { margin: .2rem 0 0; font-weight: 700; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+
+/* tap pad */
+.tap-pad {
+  position: relative;
+  display: grid; place-content: center; gap: .35rem;
+  width: 100%; margin: 1.4rem 0 1.1rem;
+  min-height: 190px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 120% at 50% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%),
+    var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  overflow: hidden;
+  transition: transform .06s ease, border-color .15s ease, background-color .15s ease;
+}
+.tap-pad:hover { border-color: var(--accent); }
+.tap-pad.is-hit { transform: scale(.988); }
+.tap-label { font-size: 2.3rem; font-weight: 800; letter-spacing: .18em; }
+.tap-hint { font-size: .85rem; color: var(--text-dim); letter-spacing: .01em; }
+.tap-ring {
+  position: absolute; inset: 50% auto auto 50%;
+  width: 120px; height: 120px; margin: -60px 0 0 -60px;
+  border-radius: 50%; border: 2px solid var(--accent);
+  opacity: 0; pointer-events: none;
+}
+.tap-pad.is-hit .tap-ring { animation: ripple .5s ease-out; }
+@keyframes ripple {
+  from { opacity: .55; transform: scale(.35); }
+  to   { opacity: 0;   transform: scale(2.4); }
+}
+.tap-pad.is-beat { background-color: color-mix(in srgb, var(--accent) 16%, var(--surface-2)); }
+.tap-pad.is-accent { background-color: color-mix(in srgb, var(--accent-2) 22%, var(--surface-2)); }
+
+kbd {
+  font: inherit; font-size: .82em; padding: .05em .42em;
+  border: 1px solid var(--border); border-bottom-width: 2px;
+  border-radius: 5px; background: var(--surface); color: var(--text-dim);
+}
+
+/* controls */
+.controls { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .62rem 1.05rem; border-radius: 11px;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text);
+  font: inherit; font-size: .95rem; font-weight: 600; cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, transform .06s ease;
+}
+.btn:hover { border-color: var(--accent); }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+.btn-primary:hover { filter: brightness(1.06); }
+.btn-lg { padding: .8rem 1.4rem; font-size: 1rem; text-decoration: none; }
+.btn-icon { width: 42px; justify-content: center; padding: .62rem 0; font-size: 1.15rem; }
+.nudge { display: flex; gap: .4rem; margin-left: auto; }
+.metro-dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; opacity: .35; }
+.btn-primary[aria-pressed="true"] .metro-dot { opacity: 1; animation: blink 1s steps(2, start) infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+
+.options {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: .75rem; margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid var(--border);
+}
+.field { display: grid; gap: .3rem; font-size: .78rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .06em; }
+.field select, .field input[type="range"] {
+  font: inherit; font-size: .92rem; text-transform: none; letter-spacing: normal;
+  color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 9px; padding: .45rem .55rem; width: 100%;
+}
+.field input[type="range"] { padding: .35rem 0; accent-color: var(--accent); background: transparent; border: 0; }
+
+/* ---------- prose ---------- */
+.prose { padding: 3rem 0 1rem; max-width: 760px; }
+.prose section { scroll-margin-top: 80px; }
+.prose h2 {
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem); letter-spacing: -.02em;
+  margin: 2.8rem 0 .8rem; padding-top: .2rem;
+}
+.prose section:first-child h2 { margin-top: 0; }
+.prose h3 { font-size: 1.12rem; margin: 1.9rem 0 .5rem; letter-spacing: -.01em; }
+.prose p { margin: 0 0 1rem; color: color-mix(in srgb, var(--text) 86%, var(--text-dim)); }
+.prose strong { color: var(--text); }
+
+.formula {
+  background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 10px; padding: .9rem 1.1rem; font-weight: 700; color: var(--text) !important;
+}
+
+.checklist { list-style: none; padding: 0; margin: 0 0 1rem; display: grid; gap: .45rem; }
+.checklist li { position: relative; padding-left: 1.6rem; color: var(--text-dim); }
+.checklist li::before {
+  content: ""; position: absolute; left: 0; top: .62em;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+}
+
+.table-scroll { overflow-x: auto; margin: 0 0 1.2rem; }
+table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+caption { text-align: left; color: var(--text-dim); font-size: .82rem; padding-bottom: .5rem; }
+th, td { text-align: left; padding: .6rem .8rem; border-bottom: 1px solid var(--border); }
+thead th { font-size: .78rem; text-transform: uppercase; letter-spacing: .07em; color: var(--text-dim); }
+tbody tr:hover { background: var(--surface); }
+
+.range-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .7rem; margin: 0 0 1.2rem; }
+.range-card {
+  display: grid; gap: .15rem; padding: .85rem .95rem;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+}
+.range-num { font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.range-label { font-size: .8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: .07em; }
+
+.faq { display: grid; gap: .5rem; }
+.faq details {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 0 1rem;
+}
+.faq summary {
+  cursor: pointer; padding: .9rem 0; font-weight: 600; list-style: none;
+  display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--accent); font-size: 1.3rem; font-weight: 400; line-height: 1; }
+.faq details[open] summary::after { content: "−"; }
+.faq details p { margin: 0 0 1rem; color: var(--text-dim); }
+
+.site-footer {
+  margin-top: 3rem; padding: 2rem 0; border-top: 1px solid var(--border);
+  color: var(--text-dim); font-size: .9rem; text-align: center;
+}
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#tool">Skip to the BPM counter</a>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">Tap<span>Tempo</span></span>
+    </a>
+    <nav class="site-nav" aria-label="Page sections">
+      <a href="#how-to-use">How to use</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#accuracy">Accuracy</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch colour theme">
+      <span class="theme-icon" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="tool">
+    <div class="wrap">
+      <h1>Tap Tempo: Free BPM Counter to Measure Beats Per Minute</h1>
+      <p class="lede">
+        Want to find a beat's BPM instantly? This tap tempo counter turns your taps into a beats-per-minute
+        result. There's no need to count for a full minute or work the tempo out by hand — just tap along
+        steadily and the counter measures the time between your taps to estimate the BPM.
+      </p>
+
+      <div class="tool" role="region" aria-label="Tap tempo BPM counter">
+        <div class="readout">
+          <div class="bpm-block">
+            <output class="bpm" id="bpm" aria-live="polite" aria-atomic="true">--</output>
+            <div class="bpm-meta">
+              <span class="bpm-unit">BPM</span>
+              <span class="bpm-precise" id="bpmPrecise"></span>
+            </div>
+            <p class="tempo-name" id="tempoName">Tap to start measuring</p>
+          </div>
+
+          <dl class="stats">
+            <div class="stat"><dt>Taps</dt><dd id="statTaps">0</dd></div>
+            <div class="stat"><dt>Avg interval</dt><dd id="statAvg">— ms</dd></div>
+            <div class="stat"><dt>Last interval</dt><dd id="statLast">— ms</dd></div>
+            <div class="stat"><dt>Steadiness</dt><dd id="statSteady">—</dd></div>
+          </dl>
+        </div>
+
+        <button class="tap-pad" id="tapPad" type="button">
+          <span class="tap-ring" aria-hidden="true"></span>
+          <span class="tap-label">TAP</span>
+          <span class="tap-hint">Click, tap, or press <kbd>Space</kbd></span>
+        </button>
+
+        <div class="controls">
+          <button class="btn" id="resetBtn" type="button">Reset <kbd>R</kbd></button>
+          <button class="btn btn-primary" id="metroBtn" type="button" aria-pressed="false">
+            <span class="metro-dot" aria-hidden="true"></span>
+            <span id="metroLabel">Start metronome</span>
+          </button>
+          <div class="nudge" role="group" aria-label="Adjust metronome tempo">
+            <button class="btn btn-icon" id="minusBtn" type="button" aria-label="Decrease BPM by one">−</button>
+            <button class="btn btn-icon" id="plusBtn" type="button" aria-label="Increase BPM by one">+</button>
+          </div>
+        </div>
+
+        <div class="options">
+          <label class="field">
+            <span>Beats per bar</span>
+            <select id="beatsPerBar">
+              <option value="1">1 (no accent)</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="6">6</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Auto-reset after</span>
+            <select id="autoReset">
+              <option value="2000">2 seconds</option>
+              <option value="3000" selected>3 seconds</option>
+              <option value="5000">5 seconds</option>
+              <option value="0">Never</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Average of</span>
+            <select id="windowSize">
+              <option value="4">Last 4 taps</option>
+              <option value="8">Last 8 taps</option>
+              <option value="16" selected>Last 16 taps</option>
+              <option value="0">All taps</option>
+            </select>
+          </label>
+          <label class="field field-volume">
+            <span>Click volume</span>
+            <input type="range" id="volume" min="0" max="100" value="60">
+          </label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap prose">
+    <section id="what-is-bpm">
+      <h2>What Is a BPM Counter?</h2>
+      <p>
+        BPM stands for <strong>"Beats Per Minute."</strong> A BPM counter is a tool that helps to measure the speed
+        of a repeating beat, which tells you how many beats occur in one minute. Like 60BPM means there is 1 beat
+        in one second.
+      </p>
+      <p>
+        A tap tempo counter makes it easier; instead of counting beats with the help of a clock, you just tap on
+        the screen, and the tool calculates the BPM from the time interval between your taps.
+      </p>
+    </section>
+
+    <section id="calculation">
+      <h2>How Is BPM Calculated?</h2>
+      <p>
+        BPM is calculated from the time between every beat. If one beat takes one second, then the tempo is 60 BPM.
+        If each beat takes half a second, then the tempo is 120 BPM. The tap tempo records the timing of your taps
+        and uses the average interval between them to measure the result. Its basic method is mostly used by BPM
+        calculators.
+      </p>
+      <div class="table-scroll">
+        <table>
+          <caption>Interval between beats, converted to tempo</caption>
+          <thead><tr><th scope="col">Milliseconds between beats</th><th scope="col">Tempo</th></tr></thead>
+          <tbody>
+            <tr><td>1,000 ms</td><td>60 BPM</td></tr>
+            <tr><td>750 ms</td><td>80 BPM</td></tr>
+            <tr><td>500 ms</td><td>120 BPM</td></tr>
+            <tr><td>400 ms</td><td>150 BPM</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The shorter the time between beats, the higher the BPM.</p>
+    </section>
+
+    <section id="how-to-use">
+      <h2>How to Use the Tap Tempo BPM Counter</h2>
+      <p>
+        Using a Tap Tempo counter is simple. The important part is following the same steady pulse instead of
+        tapping randomly. Start the music or rhythm you want to measure, then tap the button or press the assigned
+        keyboard key once for each main beat.
+      </p>
+
+      <h3>Tap in Time With the Beat</h3>
+      <p>
+        Listen for the pulse of the rhythm and tap with it. Try to tap only once per beat. Do not tap on every sound,
+        drum fill, or fast subdivision unless that is specifically the rhythm you want to measure.
+      </p>
+
+      <h3>Keep Tapping for a Stable Result</h3>
+      <p>
+        Two taps can produce a BPM number, but that result can easily be affected by one early or late tap. Continue
+        tapping for many beats. Averaging multiple time intervals reduces the effect of small timing mistakes and
+        often produces a reliable result.
+      </p>
+
+      <h3>Reset the BPM Counter</h3>
+      <p>
+        Press the reset button when you want to measure a different tempo from the start. Many tools reset
+        automatically after a pause. It prevents an old tap from affecting the next BPM measurement. The exact
+        reset timing depends on the tool being used.
+      </p>
+    </section>
+
+    <section id="how-it-works">
+      <h2>How Does Tap Tempo Work?</h2>
+      <p>
+        It works by measuring the interval between each tap you make. Every time you press the button, the tool
+        records the timing. Then it compares those timestamps and measures the intervals between each tap.
+      </p>
+
+      <h3>How Tap Intervals Are Converted Into BPM</h3>
+      <p class="formula">BPM = 60,000 ÷ average interval in milliseconds</p>
+      <p>
+        For example, if the average interval between your taps is 500 milliseconds: 60,000 ÷ 500 = 120 BPM. That is
+        why tapping continuously matters. Uneven gaps produce a different average, while steady taps create more
+        stable BPM results.
+      </p>
+
+      <h3>Why the BPM Changes While You Tap</h3>
+      <p>
+        The BPM may move up or down because every tap you make adds new timing info. If one tap is slightly early,
+        the BPM increases. If the next tap is late, it decreases again. It does not mean the tool is broken. Human
+        tapping is naturally imperfect; that is why multiple taps and averaging are useful.
+      </p>
+
+      <h3>How Many Taps Do You Need to Calculate BPM?</h3>
+      <p>
+        In technical terms, two taps are enough to calculate a tempo because they create one measurable interval.
+        For an instant estimate, 4 to 8 taps are often enough to make the number settle. If the BPM changes
+        continuously, keep tapping or start again with a steadier pulse.
+      </p>
+    </section>
+
+    <section id="accuracy">
+      <h2>How Accurate Is a Tap Tempo BPM Counter?</h2>
+      <p>
+        A tap tempo BPM counter can provide a useful result when you tap consistently. Its accuracy primarily
+        depends on your timing. Because a single tap can change the result, especially when you only do a few taps.
+      </p>
+      <p>
+        More taps can reduce the impact of a single mistaken tap. But a manual tap tempo result should be treated
+        as a measurement based on your input rather than an automatic audio analysis.
+      </p>
+
+      <h3>What Can Affect BPM Accuracy?</h3>
+      <ul class="checklist">
+        <li>Tapping too early or too late</li>
+        <li>Following different parts of the rhythm</li>
+        <li>Using only a small number of taps</li>
+        <li>Changing your tapping speed</li>
+        <li>Measuring a rhythm that changes tempo</li>
+        <li>Accidentally missing a beat</li>
+      </ul>
+      <p>
+        The counter only measures the timing you give it. If the taps are inconsistent, the BPM results will also
+        be inconsistent.
+      </p>
+
+      <h3>How to Get the Most Accurate Result</h3>
+      <p>
+        Start by listening to the music beat for a few seconds before tapping. Then follow one clear and repeating
+        pulse. Keep your tap consistent and continue long enough for the result to normalize. If you ever get a
+        different result on the second attempt, repeat the measurement and compare the reading again.
+      </p>
+
+      <h3>Understanding Different BPM Readings</h3>
+      <p>
+        Sometimes the same rhythm can appear to have different BPM values depending on which pulse you tap on. For
+        example, you tap once for every main beat and get 120bpm. If you tap only every second beat, the result may
+        become 60bpm.
+      </p>
+      <p>
+        But if you tap more frequently, it could appear as 240bpm. This is why it is important to decide which beat
+        level you are measuring before relying on the final number.
+      </p>
+    </section>
+
+    <section id="tempo">
+      <h2>BPM and Tempo</h2>
+      <p>
+        BPM and tempo are closely connected, but they serve different purposes. BPM is a number that measures how
+        many beats happen in one minute. Tempo is the overall speed or pace of the music or rhythm. For example,
+        120 BPM gives a precise numerical tempo. Words such as <em>slow</em>, <em>moderate</em>, or <em>fast</em>
+        describe tempo more generally.
+      </p>
+
+      <h3>Slow, Medium, and Fast BPM</h3>
+      <p>
+        There is no single BPM that is always considered slow or fast because the musical context matters the most.
+        But there's a simple way to understand tempo:
+      </p>
+      <div class="range-grid">
+        <div class="range-card"><span class="range-num">40–70</span><span class="range-label">Slow</span></div>
+        <div class="range-card"><span class="range-num">70–110</span><span class="range-label">Moderate</span></div>
+        <div class="range-card"><span class="range-num">110–150</span><span class="range-label">Fast</span></div>
+        <div class="range-card"><span class="range-num">150+</span><span class="range-label">Very fast</span></div>
+      </div>
+
+      <h3>Common Musical Tempo Ranges</h3>
+      <p>
+        Different musical styles can use different BPM values. A slow piece may have around 60 BPM, while a
+        moderate rhythm may be closer to 100 or 120, and faster music can move beyond 150 BPM.
+      </p>
+
+      <h3>Classical Tempo Markings and BPM</h3>
+      <p>
+        The traditional tempo markings use Italian terms such as Largo, Adagio, Andante, Moderato, and Presto.
+        These words provide a general indication of speed rather than always representing one exact BPM number.
+      </p>
+      <p>
+        Such as, Andante is generally associated with a moderate walking pace, while Allegro and Presto indicate
+        faster tempo. The exact ranges can vary depending on the musical context.
+      </p>
+      <div class="table-scroll">
+        <table>
+          <caption>Approximate classical tempo markings</caption>
+          <thead><tr><th scope="col">Marking</th><th scope="col">Approx. BPM</th><th scope="col">Character</th></tr></thead>
+          <tbody>
+            <tr><td>Grave</td><td>20–40</td><td>Very slow and solemn</td></tr>
+            <tr><td>Largo</td><td>40–60</td><td>Broad</td></tr>
+            <tr><td>Adagio</td><td>66–76</td><td>Slow and stately</td></tr>
+            <tr><td>Andante</td><td>76–108</td><td>Walking pace</td></tr>
+            <tr><td>Moderato</td><td>108–120</td><td>Moderate</td></tr>
+            <tr><td>Allegro</td><td>120–168</td><td>Fast and bright</td></tr>
+            <tr><td>Vivace</td><td>168–176</td><td>Lively</td></tr>
+            <tr><td>Presto</td><td>176–200</td><td>Very fast</td></tr>
+            <tr><td>Prestissimo</td><td>200+</td><td>As fast as possible</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>BPM vs Time Signature</h3>
+      <p>
+        BPM and time signature explain two different parts of rhythm. BPM tells you how fast the beat is moving. A
+        time signature tells you how beats are organized into groups.
+      </p>
+      <p>
+        For example, 120 BPM can exist in 4/4, 3/4, or another time signature. Changing the time signature does not
+        automatically change the BPM. A tap tempo measures the speed. It does not identify the time signature by
+        itself.
+      </p>
+    </section>
+
+    <section id="metronome">
+      <h2>Using BPM With a Metronome</h2>
+      <p>
+        Once you come to know the BPM, you can enter that number into a metronome. The metronome will produce a
+        steady pulse at the selected speed. It gives you a reference point for practicing and checking whether you
+        can maintain the same tempo.
+      </p>
+
+      <h3>How to Set a Metronome Using Your BPM Result</h3>
+      <p>
+        First, tap the rhythm until the BPM becomes stable. Then enter that BPM into your metronome. For example,
+        if your result settles around 100 BPM, set the metronome to 100 BPM and follow its pulse. The metronome
+        built into this page does that automatically — press <strong>Start metronome</strong> and it clicks at
+        your measured tempo.
+      </p>
+
+      <h3>Why BPM Matters When Practicing Rhythm</h3>
+      <p>
+        Practicing with BPM gives a measurable reference instead of only relying on how fast something feels. You
+        can start slowly and increase the BPM gradually as your timing improves. A metronome is especially
+        designed to provide a steady pulse at a chosen tempo.
+      </p>
+    </section>
+
+    <section id="devices">
+      <h2>Tap Tempo on Desktop and Mobile</h2>
+      <p>
+        Tap tempo can work on computers, mobile, and tablets as well. As long as the pages support the required
+        input method. The basic process remains the same: tap or press consistently in time with the beat.
+      </p>
+
+      <h3>Using the Mouse or Touchscreen</h3>
+      <p>
+        On a computer, you can often click the Tap button with a mouse. On a phone or tablet, you can often click
+        the Tap button directly on the screen. Try to use a comfortable and consistent movement so your taps
+        remain steady.
+      </p>
+
+      <h3>Using the Keyboard or Spacebar</h3>
+      <p>
+        Many browser-based tools allow keyboard input using the spacebar key. Keep the browser page active before
+        pressing the key. If the spacebar scrolls the page instead of tapping, click the tap tempo area first and
+        try again.
+      </p>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>Common BPM Counter Problems and Fixes</h2>
+      <p>Most of the problems come from inconsistent taps, long pauses, or using the wrong pulse. Here are some quick ways to fix these issues.</p>
+
+      <h3>The BPM Number Keeps Changing</h3>
+      <p>
+        Keep tapping consistently. A changing number usually means your tap intervals are changing too. Continue
+        for several more beats or try to reset and try again.
+      </p>
+
+      <h3>The BPM Is Too High or Too Low</h3>
+      <p>
+        Verify that you are tapping on every beat. Tapping every second beat can produce half the expected BPM,
+        while tapping subdivisions can produce a higher result.
+      </p>
+
+      <h3>The Counter Is Not Detecting Taps</h3>
+      <p>
+        Make sure the correct browser tab is active. If you are using a keyboard shortcut, click the tool first.
+        On mobile, refresh the page if the button is not responding.
+      </p>
+
+      <h3>The BPM Resets Automatically</h3>
+      <p>
+        Many tools reset after a specific period of time because of inactivity. It is normal behavior to prevent a
+        long pause from being included in the BPM measurement. Start tapping again to start a fresh measurement.
+      </p>
+
+      <h3>Different Tapping Gives Different Results</h3>
+      <p>
+        Small differences are normal. Try measuring the same beat two or three times. If the results are close,
+        use the most consistent range. If they are completely different, focus on one steady pulse and tap for
+        longer.
+      </p>
+    </section>
+
+    <section id="tips">
+      <h2>Tips for Measuring BPM More Accurately</h2>
+      <p>
+        Getting a better BPM result is mostly about consistency. Use the same pulse throughout the measurement,
+        avoid rushing to match the counter, and let the average settle naturally.
+      </p>
+      <p>
+        A simple approach works best: listen first, find the repeating beat, and then tap steadily without
+        constantly watching the number.
+      </p>
+    </section>
+
+    <section id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq">
+        <details><summary>What does BPM stand for?</summary><p>BPM stands for beats per minute, which measures how many beats occur in one minute.</p></details>
+        <details><summary>How does Tap Tempo calculate BPM?</summary><p>It measures the time between your taps, averages the intervals, and converts that timing into beats per minute.</p></details>
+        <details><summary>How many times should I tap?</summary><p>Two taps can calculate BPM, but several consistent taps provide a more stable result.</p></details>
+        <details><summary>Is Tap Tempo accurate?</summary><p>It can be accurate for a steady rhythm, but the result depends on how consistently you tap.</p></details>
+        <details><summary>Why does the BPM keep changing?</summary><p>Each new tap can change the average, especially if your tapping speed is inconsistent.</p></details>
+        <details><summary>Why am I getting half or double BPM?</summary><p>You may be tapping every second beat or tapping twice within each main beat.</p></details>
+        <details><summary>Can I use the spacebar to count BPM?</summary><p>Yes, many Tap Tempo tools support the spacebar or another keyboard key, depending on the website.</p></details>
+        <details><summary>Does Tap Tempo work on mobile?</summary><p>Yes, most browser-based Tap Tempo tools can be used with a touchscreen.</p></details>
+        <details><summary>What is the difference between BPM and tempo?</summary><p>BPM is the numerical measurement, while tempo describes the overall speed or pace.</p></details>
+        <details><summary>Is BPM the same as time signature?</summary><p>No. BPM measures speed, while time signature organizes beats into a rhythmic structure.</p></details>
+        <details><summary>Can I use the BPM result with a metronome?</summary><p>Yes. Enter the BPM result into a metronome to create a steady pulse at the same speed.</p></details>
+      </div>
+    </section>
+
+    <section id="conclusion">
+      <h2>Conclusion</h2>
+      <p>
+        A tap-tempo BPM counter gives you a quick way to turn a rhythm you can feel into a number you can use. Tap
+        consistently and continue for several beats, and use the stable result to understand the tempo or set a
+        matching metronome. The more consistent your input is, the more useful your BPM reading will be.
+      </p>
+      <p><a class="btn btn-primary btn-lg" href="#tool">Back to the BPM counter</a></p>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tap Tempo — a free BPM counter. Works offline once loaded. No account, no tracking.</p>
+  </div>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "Tap Tempo BPM Counter",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any",
+      "description": "A free online tap tempo BPM counter that measures beats per minute from your taps, with a built-in metronome.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type":"Question","name":"What does BPM stand for?","acceptedAnswer":{"@type":"Answer","text":"BPM stands for beats per minute, which measures how many beats occur in one minute."}},
+        {"@type":"Question","name":"How does tap tempo calculate BPM?","acceptedAnswer":{"@type":"Answer","text":"It measures the time between your taps, averages the intervals, and converts that timing into beats per minute."}},
+        {"@type":"Question","name":"How many times should I tap?","acceptedAnswer":{"@type":"Answer","text":"Two taps can calculate a BPM, but several consistent taps give a more stable result."}},
+        {"@type":"Question","name":"Is tap tempo accurate?","acceptedAnswer":{"@type":"Answer","text":"It can be accurate for a steady rhythm, but the result depends on how consistently you tap."}},
+        {"@type":"Question","name":"Why does the BPM keep changing?","acceptedAnswer":{"@type":"Answer","text":"Each new tap changes the average, especially if your tapping speed is inconsistent."}},
+        {"@type":"Question","name":"Why am I getting half or double the BPM?","acceptedAnswer":{"@type":"Answer","text":"You may be tapping every second beat, or tapping twice within each main beat."}},
+        {"@type":"Question","name":"Can I use the spacebar to count BPM?","acceptedAnswer":{"@type":"Answer","text":"Yes. This tool supports the spacebar and the Enter key."}},
+        {"@type":"Question","name":"Does tap tempo work on mobile?","acceptedAnswer":{"@type":"Answer","text":"Yes, most browser-based tap tempo tools work with a touchscreen."}},
+        {"@type":"Question","name":"What is the difference between BPM and tempo?","acceptedAnswer":{"@type":"Answer","text":"BPM is the numerical measurement, while tempo describes the overall speed or pace."}},
+        {"@type":"Question","name":"Is BPM the same as a time signature?","acceptedAnswer":{"@type":"Answer","text":"No. BPM measures speed, while a time signature organises beats into a rhythmic structure."}},
+        {"@type":"Question","name":"Can I use the BPM result with a metronome?","acceptedAnswer":{"@type":"Answer","text":"Yes. Enter the BPM result into a metronome to create a steady pulse at the same speed."}}
+      ]
+    }
+  ]
+}
+</script>
+<script>
+/* Tap Tempo — BPM counter + metronome. No dependencies. */
+(function () {
+  'use strict';
+
+  var MIN_BPM = 20;
+  var MAX_BPM = 400;
+  var MIN_INTERVAL_MS = 60;   // guards against double-fired events
+  var STORE_KEY = 'taptempo.prefs';
+
+  var el = {
+    bpm: document.getElementById('bpm'),
+    bpmPrecise: document.getElementById('bpmPrecise'),
+    tempoName: document.getElementById('tempoName'),
+    taps: document.getElementById('statTaps'),
+    avg: document.getElementById('statAvg'),
+    last: document.getElementById('statLast'),
+    steady: document.getElementById('statSteady'),
+    pad: document.getElementById('tapPad'),
+    reset: document.getElementById('resetBtn'),
+    metro: document.getElementById('metroBtn'),
+    metroLabel: document.getElementById('metroLabel'),
+    minus: document.getElementById('minusBtn'),
+    plus: document.getElementById('plusBtn'),
+    beatsPerBar: document.getElementById('beatsPerBar'),
+    autoReset: document.getElementById('autoReset'),
+    windowSize: document.getElementById('windowSize'),
+    volume: document.getElementById('volume'),
+    theme: document.getElementById('themeToggle')
+  };
+
+  var taps = [];          // timestamps, ms, from performance.now()
+  var bpm = null;         // current tempo (measured or nudged)
+  var resetTimer = null;
+
+  /* ---------------- tempo naming ---------------- */
+
+  var MARKINGS = [
+    [40, 'Grave — very slow'],
+    [60, 'Largo — broad'],
+    [66, 'Larghetto — rather broad'],
+    [76, 'Adagio — slow and stately'],
+    [108, 'Andante — walking pace'],
+    [120, 'Moderato — moderate'],
+    [168, 'Allegro — fast and bright'],
+    [176, 'Vivace — lively'],
+    [200, 'Presto — very fast'],
+    [Infinity, 'Prestissimo — as fast as possible']
+  ];
+
+  function markingFor(value) {
+    for (var i = 0; i < MARKINGS.length; i++) {
+      if (value < MARKINGS[i][0]) return MARKINGS[i][1];
+    }
+    return '';
+  }
+
+  /* ---------------- measurement ---------------- */
+
+  function intervals() {
+    var out = [];
+    for (var i = 1; i < taps.length; i++) out.push(taps[i] - taps[i - 1]);
+    var limit = parseInt(el.windowSize.value, 10) || 0;
+    // "last N taps" means the N-1 most recent intervals
+    if (limit > 1 && out.length > limit - 1) out = out.slice(out.length - (limit - 1));
+    return out;
+  }
+
+  function mean(list) {
+    var total = 0;
+    for (var i = 0; i < list.length; i++) total += list[i];
+    return total / list.length;
+  }
+
+  function steadiness(list, average) {
+    if (list.length < 2) return null;
+    var variance = 0;
+    for (var i = 0; i < list.length; i++) {
+      var d = list[i] - average;
+      variance += d * d;
+    }
+    var cv = Math.sqrt(variance / list.length) / average;
+    return Math.max(0, Math.min(100, Math.round(100 - cv * 300)));
+  }
+
+  function registerTap() {
+    var now = performance.now();
+    var gap = taps.length ? now - taps[taps.length - 1] : Infinity;
+
+    if (gap < MIN_INTERVAL_MS) return;               // ignore duplicate events
+
+    var idle = parseInt(el.autoReset.value, 10) || 0;
+    if (idle && gap > idle) taps = [];               // stale pause: start fresh
+
+    taps.push(now);
+    if (taps.length > 200) taps.shift();
+
+    var list = intervals();
+    if (list.length) {
+      var average = mean(list);
+      bpm = clamp(60000 / average);
+    }
+
+    scheduleAutoReset();
+    render();
+    flashPad();
+  }
+
+  function clamp(value) {
+    return Math.min(MAX_BPM, Math.max(MIN_BPM, value));
+  }
+
+  function scheduleAutoReset() {
+    clearTimeout(resetTimer);
+    var idle = parseInt(el.autoReset.value, 10) || 0;
+    if (!idle) return;
+    resetTimer = setTimeout(function () { taps = []; render(); }, idle);
+  }
+
+  function reset() {
+    clearTimeout(resetTimer);
+    taps = [];
+    bpm = null;
+    render();
+  }
+
+  function nudge(delta) {
+    bpm = clamp(Math.round((bpm || 120) + delta));
+    taps = [];                                        // next tap starts a fresh measurement
+    clearTimeout(resetTimer);
+    render();
+  }
+
+  /* ---------------- rendering ---------------- */
+
+  function render() {
+    var list = intervals();
+    var counted = taps.length;
+
+    if (bpm === null) {
+      el.bpm.textContent = '--';
+      el.bpmPrecise.textContent = '';
+      el.tempoName.textContent = 'Tap to start measuring';
+    } else {
+      el.bpm.textContent = String(Math.round(bpm));
+      el.bpmPrecise.textContent = bpm.toFixed(1);
+      el.tempoName.textContent = counted === 1
+        ? 'Keep tapping — one more for a reading'
+        : markingFor(bpm);
+    }
+
+    if (counted === 1) {
+      el.bpm.textContent = '--';
+      el.bpmPrecise.textContent = '';
+    }
+
+    el.taps.textContent = String(counted);
+
+    if (list.length) {
+      var average = mean(list);
+      el.avg.textContent = Math.round(average) + ' ms';
+      el.last.textContent = Math.round(list[list.length - 1]) + ' ms';
+      var s = steadiness(list, average);
+      el.steady.textContent = s === null ? '—' : s + '%';
+    } else {
+      el.avg.textContent = '— ms';
+      el.last.textContent = '— ms';
+      el.steady.textContent = '—';
+    }
+  }
+
+  var hitTimer = null;
+  function flashPad() {
+    el.pad.classList.remove('is-hit');
+    void el.pad.offsetWidth;                          // restart the ripple animation
+    el.pad.classList.add('is-hit');
+    clearTimeout(hitTimer);
+    hitTimer = setTimeout(function () { el.pad.classList.remove('is-hit'); }, 500);
+  }
+
+  /* ---------------- metronome ---------------- */
+
+  var audio = null;
+  var running = false;
+  var nextBeatTime = 0;       // in audio-context time
+  var beatInBar = 0;
+  var lookahead = null;
+  var SCHEDULE_AHEAD = 0.12;  // seconds
+
+  function ensureAudio() {
+    if (!audio) {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return null;
+      audio = new Ctx();
+    }
+    if (audio.state === 'suspended') audio.resume();
+    return audio;
+  }
+
+  function click(time, accent) {
+    var osc = audio.createOscillator();
+    var gain = audio.createGain();
+    var level = (parseInt(el.volume.value, 10) / 100) * 0.5;
+
+    osc.frequency.value = accent ? 1600 : 1000;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, level), time + 0.002);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+
+    osc.connect(gain).connect(audio.destination);
+    osc.start(time);
+    osc.stop(time + 0.06);
+
+    var delay = (time - audio.currentTime) * 1000;
+    setTimeout(function () {
+      if (!running) return;
+      var cls = accent ? 'is-accent' : 'is-beat';
+      el.pad.classList.add(cls);
+      setTimeout(function () { el.pad.classList.remove(cls); }, 70);
+    }, Math.max(0, delay));
+  }
+
+  function schedule() {
+    var perBar = parseInt(el.beatsPerBar.value, 10) || 1;
+    while (nextBeatTime < audio.currentTime + SCHEDULE_AHEAD) {
+      click(nextBeatTime, perBar > 1 && beatInBar === 0);
+      nextBeatTime += 60 / (bpm || 120);              // re-read tempo every beat
+      beatInBar = (beatInBar + 1) % perBar;
+    }
+  }
+
+  function startMetronome() {
+    if (!ensureAudio()) return;
+    running = true;
+    beatInBar = 0;
+    nextBeatTime = audio.currentTime + 0.06;
+    lookahead = setInterval(schedule, 25);
+    el.metro.setAttribute('aria-pressed', 'true');
+    el.metroLabel.textContent = 'Stop metronome';
+  }
+
+  function stopMetronome() {
+    running = false;
+    clearInterval(lookahead);
+    el.pad.classList.remove('is-beat', 'is-accent');
+    el.metro.setAttribute('aria-pressed', 'false');
+    el.metroLabel.textContent = 'Start metronome';
+  }
+
+  function toggleMetronome() {
+    if (running) stopMetronome();
+    else {
+      if (bpm === null) bpm = 120;
+      startMetronome();
+      render();
+    }
+  }
+
+  /* ---------------- preferences ---------------- */
+
+  function savePrefs() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        beatsPerBar: el.beatsPerBar.value,
+        autoReset: el.autoReset.value,
+        windowSize: el.windowSize.value,
+        volume: el.volume.value,
+        theme: document.documentElement.getAttribute('data-theme') || 'dark'
+      }));
+    } catch (e) { /* private mode: preferences just won't persist */ }
+  }
+
+  function loadPrefs() {
+    var saved;
+    try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) { saved = {}; }
+    if (saved.beatsPerBar) el.beatsPerBar.value = saved.beatsPerBar;
+    if (saved.autoReset) el.autoReset.value = saved.autoReset;
+    if (saved.windowSize) el.windowSize.value = saved.windowSize;
+    if (saved.volume) el.volume.value = saved.volume;
+    setTheme(saved.theme || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'));
+  }
+
+  function setTheme(name) {
+    document.documentElement.setAttribute('data-theme', name);
+    var color = name === 'light' ? '#f6f8fc' : '#0d1017';
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', color);
+  }
+
+  /* ---------------- wiring ---------------- */
+
+  el.pad.addEventListener('pointerdown', function (e) {
+    e.preventDefault();
+    registerTap();
+  });
+
+  el.reset.addEventListener('click', reset);
+  el.metro.addEventListener('click', toggleMetronome);
+  el.minus.addEventListener('click', function () { nudge(-1); });
+  el.plus.addEventListener('click', function () { nudge(1); });
+
+  [el.beatsPerBar, el.autoReset, el.windowSize, el.volume].forEach(function (input) {
+    input.addEventListener('change', function () { savePrefs(); render(); });
+  });
+  el.windowSize.addEventListener('change', function () {
+    var list = intervals();
+    if (list.length) bpm = clamp(60000 / mean(list));
+    render();
+  });
+
+  el.theme.addEventListener('click', function () {
+    var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    setTheme(next);
+    savePrefs();
+  });
+
+  document.addEventListener('keydown', function (e) {
+    var tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+    if (e.repeat) return;
+
+    if (e.code === 'Space' || e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      registerTap();
+    } else if (e.key === 'r' || e.key === 'R' || e.key === 'Escape') {
+      e.preventDefault();
+      reset();
+    } else if (e.key === 'm' || e.key === 'M') {
+      e.preventDefault();
+      toggleMetronome();
+    }
+  });
+
+  loadPrefs();
+  render();
+})();
+
+</script>
+</body>
+</html>
